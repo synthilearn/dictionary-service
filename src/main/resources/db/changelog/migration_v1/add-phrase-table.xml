@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="create-phrase-table" author="nporshennikov">
+        <createTable tableName="phrase">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="dictionary_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="primary_language" type="VARCHAR(1024)" defaultValue="EN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="part_of_speech" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="creation_date" type="timestamptz">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_date" type="timestamptz">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="phrase-foreign-key" author="nporshennikov">
+        <addForeignKeyConstraint
+                baseTableName="phrase"
+                baseColumnNames="dictionary_id"
+                constraintName="fk_dictionary_id_phrase"
+                referencedTableName="dictionary"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

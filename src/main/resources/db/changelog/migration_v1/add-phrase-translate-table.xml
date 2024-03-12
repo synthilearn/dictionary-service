@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="create-phrase-translate-table" author="nporshennikov">
+        <createTable tableName="phrase_translate">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="phrase_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="translation_text" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="creation_date" type="timestamptz">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_date" type="timestamptz">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="phrase-translate-foreign-key" author="nporshennikov">
+        <addForeignKeyConstraint
+                baseTableName="phrase_translate"
+                baseColumnNames="phrase_id"
+                constraintName="fk_phrase_id_phrase_translate"
+                referencedTableName="phrase"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

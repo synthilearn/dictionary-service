@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="create-dictionary-parameters-table" author="nporshennikov">
+        <createTable tableName="dictionary_parameters">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="show_translation" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="groups" type="VARCHAR(1024)"/>
+            <column name="parts_of_speech" type="VARCHAR(1024)"/>
+                <column name="date_to" type="date"/>
+            <column name="date_from" type="date"/>
+            <column name="phrase_types" type="VARCHAR(1024)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="dictionary-parameters-foreign-key" author="nporshennikov">
+        <addForeignKeyConstraint
+                baseTableName="dictionary_parameters"
+                baseColumnNames="id"
+                constraintName="fk_dictionary_id_dictionary_parameters"
+                referencedTableName="dictionary"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>
