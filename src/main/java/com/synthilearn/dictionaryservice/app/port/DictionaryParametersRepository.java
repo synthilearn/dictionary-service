@@ -1,13 +1,17 @@
 package com.synthilearn.dictionaryservice.app.port;
 
-import com.synthilearn.dictionaryservice.domain.Dictionary;
-import com.synthilearn.dictionaryservice.domain.DictionaryParameters;
-import com.synthilearn.dictionaryservice.infra.persistence.jpa.entity.DictionaryParametersEntity;
-import reactor.core.publisher.Mono;
-
 import java.util.UUID;
+
+import com.synthilearn.dictionaryservice.domain.DictionaryParameters;
+import com.synthilearn.dictionaryservice.infra.api.rest.dto.GetAllPhraseRequestDto;
+
+import reactor.core.publisher.Mono;
 
 public interface DictionaryParametersRepository {
 
     Mono<DictionaryParameters> initDictionary(UUID workareaId);
+
+    Mono<DictionaryParameters> editParameters(GetAllPhraseRequestDto requestDto);
+
+    Mono<DictionaryParameters> findByDictionaryId(UUID dictionaryId);
 }

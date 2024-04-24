@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+import reactor.core.publisher.Mono;
+
 @Repository
 public interface DictionaryParametersJpaRepository extends ReactiveCrudRepository<DictionaryParametersEntity, UUID> {
 }

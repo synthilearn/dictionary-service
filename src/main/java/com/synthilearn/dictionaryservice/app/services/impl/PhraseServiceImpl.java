@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.synthilearn.dictionaryservice.app.port.DictionaryParametersRepository;
 import com.synthilearn.dictionaryservice.app.port.PhraseRepository;
 import com.synthilearn.dictionaryservice.app.port.PhraseTranslateRepository;
 import com.synthilearn.dictionaryservice.app.services.PhraseService;
@@ -36,6 +37,7 @@ public class PhraseServiceImpl implements PhraseService {
 
     private final PhraseRepository phraseRepository;
     private final PhraseTranslateRepository phraseTranslateRepository;
+    private final DictionaryParametersRepository dictionaryParametersRepository;
     private final PhraseDtoMapper phraseDtoMapper;
 
     @Override
@@ -91,9 +93,12 @@ public class PhraseServiceImpl implements PhraseService {
     }
 
     @Override
+    @Transactional
     public Mono<Object> findAll(GetAllPhraseRequestDto requestDto) {
         return phraseRepository.findAll(requestDto)
                 .flatMap(phrases -> {
+                    dictionaryParametersRepository.editParameters(requestDto)
+                            .subscribe();
                     if (Boolean.FALSE.equals(requestDto.getShowTranslates())) {
                         return Mono.just(phrases);
                     }

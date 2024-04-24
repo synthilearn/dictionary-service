@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -16,9 +17,9 @@ public class DictionaryParameters {
 
     private UUID id;
     private Boolean showTranslation;
-    private String groups;
-    private String partsOfSpeech;
+    private List<Groups> groups;
+    private List<PartOfSpeech> partsOfSpeech;
     private LocalDate dateTo;
     private LocalDate dateFrom;
-    private String phraseTypes;
+    private List<PhraseType> phraseTypes;
 }

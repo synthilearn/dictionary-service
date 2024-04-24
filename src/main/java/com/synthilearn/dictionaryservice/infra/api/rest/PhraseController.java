@@ -19,6 +19,7 @@ import com.synthilearn.dictionaryservice.domain.Phrase;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.GetAllPhraseRequestDto;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.InitPhraseRequest;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -57,6 +58,7 @@ public class PhraseController {
                 .map(GenericResponse::ok);
     }
 
+    @Timed(value = "get_all_metrics", description = "Получение всех фраз")
     @PostMapping("/all")
     public Mono<GenericResponse<Object>> getAll(
             @RequestBody @Valid GetAllPhraseRequestDto requestDto) {
