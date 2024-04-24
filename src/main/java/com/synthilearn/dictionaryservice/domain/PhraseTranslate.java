@@ -1,5 +1,6 @@
 package com.synthilearn.dictionaryservice.domain;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -17,4 +18,5 @@ public class PhraseTranslate {
     private UUID phraseId;
     private String translationText;
     private PhraseStatus status;
+    private ZonedDateTime creationDate;
 }

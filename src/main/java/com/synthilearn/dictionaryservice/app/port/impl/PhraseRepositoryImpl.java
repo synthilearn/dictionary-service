@@ -1,19 +1,23 @@
 package com.synthilearn.dictionaryservice.app.port.impl;
 
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.synthilearn.dictionaryservice.app.port.PhraseRepository;
 import com.synthilearn.dictionaryservice.domain.PartOfSpeech;
 import com.synthilearn.dictionaryservice.domain.Phrase;
 import com.synthilearn.dictionaryservice.domain.PhraseStatus;
+import com.synthilearn.dictionaryservice.infra.api.rest.dto.GetAllPhraseRequestDto;
 import com.synthilearn.dictionaryservice.infra.persistence.jpa.entity.PhraseEntity;
 import com.synthilearn.dictionaryservice.infra.persistence.jpa.mapper.PhraseEntityMapper;
 import com.synthilearn.dictionaryservice.infra.persistence.jpa.repository.PhraseJpaRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
-import java.time.ZonedDateTime;
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 @Service
 @Transactional(readOnly = true)
@@ -40,6 +44,12 @@ public class PhraseRepositoryImpl implements PhraseRepository {
     public Mono<Phrase> findByTextAndType(String text, PartOfSpeech part) {
         return phraseJpaRepository.findByTextAndPartOfSpeech(text, part)
                 .map(phraseEntityMapper::map);
+    }
+
+    @Override
+    public Mono<List<Phrase>> findAll(GetAllPhraseRequestDto requestDto) {
+        return phraseJpaRepository.findAllPhrasesWithTranslations(requestDto.getDictionaryId())
+                .collectList();
     }
 
     private PhraseEntity initPhraseEntity(Phrase phrase) {

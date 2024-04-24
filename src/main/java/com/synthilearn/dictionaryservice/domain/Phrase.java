@@ -1,6 +1,5 @@
 package com.synthilearn.dictionaryservice.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Phrase {
+public class Phrase implements Comparable<Phrase> {
 
     private UUID id;
     private UUID dictionaryId;
@@ -21,9 +20,10 @@ public class Phrase {
     private PhraseType type;
     private PartOfSpeech partOfSpeech;
     private PhraseStatus status;
-    private List<PhraseTranslate> phraseTranslates = new ArrayList<>();
+    private List<PhraseTranslate> phraseTranslates;
 
-    public void addTranslate(PhraseTranslate phraseTranslate) {
-        phraseTranslates.add(phraseTranslate);
+    @Override
+    public int compareTo(Phrase o) {
+        return this.text.compareTo(o.text);
     }
 }
