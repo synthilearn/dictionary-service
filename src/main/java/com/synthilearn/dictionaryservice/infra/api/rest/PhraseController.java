@@ -1,11 +1,11 @@
 package com.synthilearn.dictionaryservice.infra.api.rest;
 
 
-import java.util.List;
 import java.util.UUID;
 
 import jakarta.validation.Valid;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,13 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.synthilearn.commonstarter.GenericResponse;
 import com.synthilearn.dictionaryservice.app.services.PhraseService;
-import com.synthilearn.dictionaryservice.domain.PartOfSpeech;
 import com.synthilearn.dictionaryservice.domain.Phrase;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.GetAllPhraseRequestDto;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.InitPhraseRequest;
 
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -38,10 +36,24 @@ public class PhraseController {
                 .map(GenericResponse::ok);
     }
 
-    @GetMapping("/{partOfSpeech}/{text}")
+    @GetMapping("/{dictionaryId}/{text}")
     public Mono<GenericResponse<Phrase>> findPhraseByPartOfSpeechAndText(
-            @PathVariable PartOfSpeech partOfSpeech, @PathVariable String text) {
-        return phraseService.findByPartAndText(partOfSpeech, text)
+            @PathVariable UUID dictionaryId, @PathVariable String text) {
+        return phraseService.findByDictionaryAndText(dictionaryId, text)
+                .map(GenericResponse::ok);
+    }
+
+    @GetMapping("/{phraseId}")
+    public Mono<GenericResponse<Phrase>> findById(
+            @PathVariable UUID phraseId) {
+        return phraseService.findById(phraseId)
+                .map(GenericResponse::ok);
+    }
+
+    @DeleteMapping("/{phraseId}")
+    public Mono<GenericResponse<Void>> deletePhrase(
+            @PathVariable UUID phraseId) {
+        return phraseService.delete(phraseId)
                 .map(GenericResponse::ok);
     }
 

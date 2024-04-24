@@ -14,6 +14,7 @@ COPY --from=download /home/curl_user/opentelemetry-javaagent.jar /opentelemetry-
 ARG GIT_USERNAME
 ARG GIT_PASSWORD
 
+ENV TZ=Asia/Novosibirsk
 ENV GIT_USERNAME=${GIT_USERNAME}
 ENV GIT_PASSWORD=${GIT_PASSWORD}
 ENV JAVA_TOOL_OPTIONS="-javaagent:/opentelemetry-javaagent.jar"

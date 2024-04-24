@@ -11,6 +11,7 @@ import com.synthilearn.dictionaryservice.app.port.PhraseRepository;
 import com.synthilearn.dictionaryservice.app.port.PhraseTranslateRepository;
 import com.synthilearn.dictionaryservice.domain.PhraseStatus;
 import com.synthilearn.dictionaryservice.domain.PhraseTranslate;
+import com.synthilearn.dictionaryservice.infra.api.rest.dto.TranslationShort;
 import com.synthilearn.dictionaryservice.infra.api.rest.exception.PhraseException;
 import com.synthilearn.dictionaryservice.infra.persistence.jpa.entity.PhraseTranslateEntity;
 import com.synthilearn.dictionaryservice.infra.persistence.jpa.mapper.PhraseTranslateEntityMapper;
@@ -31,7 +32,7 @@ public class PhraseTranslateRepositoryImpl implements PhraseTranslateRepository 
     @Override
     @Transactional
     public Mono<List<PhraseTranslate>> updatePhraseTranslations(UUID phraseId,
-                                                                List<String> translations) {
+                                                                List<TranslationShort> translations) {
         return phraseRepository.findById(phraseId)
                 .switchIfEmpty(Mono.error(PhraseException.notFound(phraseId)))
                 .flatMap(phrase -> {
@@ -41,20 +42,29 @@ public class PhraseTranslateRepositoryImpl implements PhraseTranslateRepository 
                     return translateJpaRepository.findByPhraseId(phraseId)
                             .collectList()
                             .flatMap(oldTranslates -> {
-                                List<String> existingTranslations = oldTranslates.stream()
-                                        .map(PhraseTranslateEntity::getTranslationText)
+                                List<TranslationShort> existingTranslations = oldTranslates.stream()
+                                        .map(translate -> new TranslationShort(
+                                                translate.getPartOfSpeech(),
+                                                translate.getTranslationText()))
                                         .toList();
 
                                 List<PhraseTranslateEntity> translationsToRemove =
                                         oldTranslates.stream()
-                                                .filter(translate -> !translations.contains(
-                                                        translate.getTranslationText()))
+                                                .filter(translate -> translations.stream()
+                                                        .noneMatch(x -> x.getText()
+                                                                .equals(translate.getTranslationText())
+                                                                && x.getPartOfSpeech()
+                                                                .equals(translate.getPartOfSpeech())))
                                                 .toList();
 
                                 List<PhraseTranslateEntity> translationsToAdd =
                                         newPhraseTranslateEntities.stream()
-                                                .filter(translate -> !existingTranslations.contains(
-                                                        translate.getTranslationText()))
+                                                .filter(translate -> existingTranslations.stream()
+                                                        .noneMatch(existingTranslation ->
+                                                                existingTranslation.getText()
+                                                                        .equals(translate.getTranslationText()) &&
+                                                                        existingTranslation.getPartOfSpeech()
+                                                                                .equals(translate.getPartOfSpeech())))
                                                 .toList();
 
                                 translateJpaRepository.deleteAll(translationsToRemove)
@@ -77,12 +87,26 @@ public class PhraseTranslateRepositoryImpl implements PhraseTranslateRepository 
                 .collectList();
     }
 
-    private List<PhraseTranslateEntity> initListPhraseTranslateEntity(List<String> translations,
-                                                                      UUID phraseId) {
-        return translations.stream().map(translateStr -> PhraseTranslateEntity.builder()
+    @Override
+    @Transactional
+    public Mono<Void> deleteAll(UUID phraseId) {
+        return translateJpaRepository.findByPhraseId(phraseId)
+                .flatMap(phraseTranslateEntity -> {
+                    assert phraseTranslateEntity.getId() != null;
+                    return translateJpaRepository.deleteById(phraseTranslateEntity.getId());
+                })
+                .then();
+    }
+
+
+    private List<PhraseTranslateEntity> initListPhraseTranslateEntity(
+            List<TranslationShort> translations,
+            UUID phraseId) {
+        return translations.stream().map(translate -> PhraseTranslateEntity.builder()
                 .id(UUID.randomUUID())
                 .phraseId(phraseId)
-                .translationText(translateStr)
+                .translationText(translate.getText())
+                .partOfSpeech(translate.getPartOfSpeech())
                 .creationDate(ZonedDateTime.now())
                 .updatedDate(ZonedDateTime.now())
                 .status(PhraseStatus.ACTIVE)

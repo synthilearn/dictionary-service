@@ -22,9 +22,6 @@
             <column name="type" type="VARCHAR(1024)">
                 <constraints nullable="false"/>
             </column>
-            <column name="part_of_speech" type="VARCHAR(1024)">
-                <constraints nullable="false"/>
-            </column>
             <column name="creation_date" type="timestamptz">
                 <constraints nullable="false"/>
             </column>

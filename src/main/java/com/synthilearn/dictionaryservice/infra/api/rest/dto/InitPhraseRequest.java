@@ -3,10 +3,11 @@ package com.synthilearn.dictionaryservice.infra.api.rest.dto;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
-import com.synthilearn.dictionaryservice.domain.PartOfSpeech;
 import com.synthilearn.dictionaryservice.domain.PhraseType;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class InitPhraseRequest {
     @NotNull
     private PhraseType type;
     @NotNull
-    private PartOfSpeech partOfSpeech;
-    @NotNull
-    private List<String> translations;
+    @Valid
+    @Size(min = 1)
+    private List<TranslationShort> translations;
 }

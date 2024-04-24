@@ -29,8 +29,6 @@ public class PhraseEntity implements Persistable<UUID> {
     private UUID dictionaryId;
     private String text;
     private PhraseType type;
-    @Column("part_of_speech")
-    private PartOfSpeech partOfSpeech;
     @Column("creation_date")
     private ZonedDateTime creationDate;
     @Column("updated_date")

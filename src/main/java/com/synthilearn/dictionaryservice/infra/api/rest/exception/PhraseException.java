@@ -18,10 +18,10 @@ public class PhraseException extends GenericException {
                 HttpStatus.NOT_FOUND, 1000);
     }
 
-    public static PhraseException notFoundByPartAndText(PartOfSpeech part, String text) {
+    public static PhraseException notFoundByPartAndText(UUID dictionaryId, String text) {
         return new PhraseException(
-                String.format("Phrase with part of speech: %s and text: %s not found",
-                        part, text), HttpStatus.NOT_FOUND, 1000);
+                String.format("Phrase for dictionary: %s and text: %s not found",
+                        dictionaryId, text), HttpStatus.NOT_FOUND, 1000);
     }
 
     public static PhraseException alreadyExists(String text, PartOfSpeech part) {

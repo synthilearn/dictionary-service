@@ -1,12 +1,9 @@
 package com.synthilearn.dictionaryservice.app.services.impl;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -14,13 +11,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import com.synthilearn.dictionaryservice.app.port.PhraseRepository;
 import com.synthilearn.dictionaryservice.app.port.PhraseTranslateRepository;
 import com.synthilearn.dictionaryservice.app.services.PhraseService;
 import com.synthilearn.dictionaryservice.domain.Groups;
-import com.synthilearn.dictionaryservice.domain.PartOfSpeech;
 import com.synthilearn.dictionaryservice.domain.Phrase;
 import com.synthilearn.dictionaryservice.domain.PhraseStatus;
 import com.synthilearn.dictionaryservice.domain.PhraseTranslate;
@@ -36,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PhraseServiceImpl implements PhraseService {
 
@@ -45,9 +39,8 @@ public class PhraseServiceImpl implements PhraseService {
     private final PhraseDtoMapper phraseDtoMapper;
 
     @Override
-    @Transactional
     public Mono<Phrase> initPhrase(InitPhraseRequest request) {
-        return phraseRepository.findByTextAndType(request.getText(), request.getPartOfSpeech())
+        return phraseRepository.findByText(request.getText(), request.getDictionaryId())
                 .singleOptional()
                 .flatMap(phraseOpt -> phraseOpt.<Mono<? extends Phrase>>map(Mono::just)
                         .orElse(phraseRepository.initPhrase(initPhraseDomain(request))))
@@ -61,14 +54,40 @@ public class PhraseServiceImpl implements PhraseService {
     }
 
     @Override
-    public Mono<Phrase> findByPartAndText(PartOfSpeech part, String text) {
-        return phraseRepository.findByTextAndType(text, part)
+    public Mono<Phrase> findByDictionaryAndText(UUID dictionaryId, String text) {
+        return phraseRepository.findByText(text, dictionaryId)
                 .flatMap(phrase -> phraseTranslateRepository.findByPhraseId(phrase.getId())
                         .map(phraseTranslates -> {
                             phrase.setPhraseTranslates(phraseTranslates);
                             return phrase;
                         }))
-                .switchIfEmpty(Mono.error(PhraseException.notFoundByPartAndText(part, text)));
+                .switchIfEmpty(
+                        Mono.error(PhraseException.notFoundByPartAndText(dictionaryId, text)));
+    }
+
+    @Override
+    public Mono<Phrase> findById(UUID phraseId) {
+        return phraseRepository.findById(phraseId)
+                .switchIfEmpty(Mono.error(PhraseException.notFound(phraseId)))
+                .flatMap(phrase -> phraseTranslateRepository.findByPhraseId(phrase.getId())
+                        .map(phraseTranslates -> {
+                            phrase.setPhraseTranslates(phraseTranslates);
+                            return phrase;
+                        }));
+    }
+
+    @Override
+    @Transactional
+    public Mono<Void> delete(UUID phraseId) {
+        return phraseRepository.findById(phraseId)
+                .switchIfEmpty(Mono.error(PhraseException.notFound(phraseId)))
+                .flatMap(phrase -> {
+                    phraseTranslateRepository.deleteAll(phraseId)
+                            .subscribe();
+                    phraseRepository.delete(phraseId)
+                            .subscribe();
+                    return Mono.empty();
+                });
     }
 
     @Override
@@ -83,56 +102,25 @@ public class PhraseServiceImpl implements PhraseService {
                         Mono<Phrase> phraseWithTranslates = phraseTranslateRepository
                                 .findByPhraseId(phrase.getId())
                                 .map(phraseTranslates -> {
-                                    phrase.setPhraseTranslates(phraseTranslates);
+                                    List<PhraseTranslate> filteredPhraseTranslates =
+                                            phraseTranslates.stream()
+                                                    .filter(phraseTranslate -> requestDto.getPartsOfSpeech()
+                                                            .contains(
+                                                                    phraseTranslate.getPartOfSpeech()))
+                                                    .collect(Collectors.toList());
+                                    phrase.setPhraseTranslates(filteredPhraseTranslates);
                                     return phrase;
                                 });
                         monoList.add(phraseWithTranslates);
                     }
                     return Mono.zip(monoList, objects -> phrases);
-                })
-                .flatMap(phrases -> Mono.just(phrases.stream()
-                        .filter(phrase -> {
-                            if (!CollectionUtils.isEmpty(requestDto.getPartsOfSpeech())) {
-                                return requestDto.getPartsOfSpeech()
-                                        .contains(phrase.getPartOfSpeech());
-                            }
-                            return true;
-                        }).filter(phrase -> {
-                            if (!CollectionUtils.isEmpty(requestDto.getPhraseTypes())) {
-                                return requestDto.getPhraseTypes().contains(phrase.getType());
-                            }
-                            return true;
-                        }).filter(phrase -> {
-                            List<PhraseTranslate> phraseTranslates = phrase.getPhraseTranslates();
-                            for (PhraseTranslate phraseTranslate : phraseTranslates) {
-                                ZonedDateTime startTime;
-                                ZonedDateTime endTime;
-                                boolean inRange = true;
-
-                                if (Objects.nonNull(requestDto.getStartDate())) {
-                                    startTime = ZonedDateTime.of(
-                                            requestDto.getStartDate().atStartOfDay(),
-                                            ZoneId.systemDefault());
-                                    inRange = startTime.isBefore(phraseTranslate.getCreationDate());
-                                }
-                                if (Objects.nonNull(requestDto.getEndDate())) {
-                                    endTime = ZonedDateTime.of(
-                                            requestDto.getEndDate().atStartOfDay().plusDays(1),
-                                            ZoneId.systemDefault());
-                                    inRange = inRange &&
-                                            endTime.isAfter(phraseTranslate.getCreationDate());
-                                }
-
-                                return inRange;
-                            }
-                            return true;
-                        }).collect(Collectors.toList())))
-                .flatMap(phrases -> {
-                    if (CollectionUtils.isEmpty(requestDto.getGroups())) {
-                        return Mono.just(resizeEmptyGroup(phrases, requestDto));
-                    }
-                    return Mono.just(group(phrases, requestDto.getGroups(), requestDto));
                 });
+//                .flatMap(phrases -> {
+//                    if (CollectionUtils.isEmpty(requestDto.getGroups())) {
+//                        return Mono.just(resizeEmptyGroup(phrases, requestDto));
+//                    }
+//                    return Mono.just(group(phrases, requestDto.getGroups(), requestDto));
+//                });
     }
 
     private AllPhrasesDto<List<Phrase>> resizeEmptyGroup(List<Phrase> phrases,
@@ -242,12 +230,13 @@ public class PhraseServiceImpl implements PhraseService {
     }
 
     private MapKeys getKeys(Phrase phrase, List<Groups> groups) {
-        if (groups.getFirst().equals(Groups.LETTER)) {
-            return new MapKeys(phrase.getText().substring(0, 1).toUpperCase(),
-                    phrase.getPartOfSpeech().toString());
-        }
-        return new MapKeys(phrase.getPartOfSpeech().toString(),
-                phrase.getText().substring(0, 1).toUpperCase());
+//        if (groups.getFirst().equals(Groups.LETTER)) {
+//            return new MapKeys(phrase.getText().substring(0, 1).toUpperCase(),
+//                    phrase.getPartOfSpeech().toString());
+//        }
+//        return new MapKeys(phrase.getPartOfSpeech().toString(),
+//                phrase.getText().substring(0, 1).toUpperCase());
+        return null;
     }
 
     @Getter

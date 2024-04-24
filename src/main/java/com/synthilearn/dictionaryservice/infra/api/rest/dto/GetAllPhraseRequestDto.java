@@ -2,9 +2,11 @@ package com.synthilearn.dictionaryservice.infra.api.rest.dto;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import com.synthilearn.dictionaryservice.domain.Groups;
 import com.synthilearn.dictionaryservice.domain.PartOfSpeech;
@@ -23,9 +25,13 @@ public class GetAllPhraseRequestDto {
     private Integer page;
     private Integer size;
     private List<Groups> groups;
-    private Boolean showTranslates; //
-    private List<PartOfSpeech> partsOfSpeech; //
-    private LocalDate startDate; //
-    private LocalDate endDate; //
-    private List<PhraseType> phraseTypes; //
+    private Boolean showTranslates;
+    @NotNull
+    @Size(min = 1)
+    private Set<PartOfSpeech> partsOfSpeech;
+    private LocalDate startDate = LocalDate.ofYearDay(1900, 1);
+    private LocalDate endDate = LocalDate.ofYearDay(2100, 1);
+    @NotNull
+    @Size(min = 1)
+    private List<PhraseType> phraseTypes;
 }

@@ -1,8 +1,10 @@
 package com.synthilearn.dictionaryservice.app.port.impl;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +13,7 @@ import com.synthilearn.dictionaryservice.app.port.PhraseRepository;
 import com.synthilearn.dictionaryservice.domain.PartOfSpeech;
 import com.synthilearn.dictionaryservice.domain.Phrase;
 import com.synthilearn.dictionaryservice.domain.PhraseStatus;
+import com.synthilearn.dictionaryservice.domain.PhraseType;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.GetAllPhraseRequestDto;
 import com.synthilearn.dictionaryservice.infra.persistence.jpa.entity.PhraseEntity;
 import com.synthilearn.dictionaryservice.infra.persistence.jpa.mapper.PhraseEntityMapper;
@@ -41,15 +44,31 @@ public class PhraseRepositoryImpl implements PhraseRepository {
     }
 
     @Override
-    public Mono<Phrase> findByTextAndType(String text, PartOfSpeech part) {
-        return phraseJpaRepository.findByTextAndPartOfSpeech(text, part)
-                .map(phraseEntityMapper::map);
+    public Mono<Phrase> findByText(String text, UUID dictionaryId) {
+        return phraseJpaRepository.findFirstByTextAndDictionaryId(text, dictionaryId)
+                .map(x -> {
+                    System.out.println(x);
+                    return phraseEntityMapper.map(x);
+                });
     }
 
     @Override
     public Mono<List<Phrase>> findAll(GetAllPhraseRequestDto requestDto) {
-        return phraseJpaRepository.findAllPhrasesWithTranslations(requestDto.getDictionaryId())
+        return phraseJpaRepository.findAllPhrasesWithTranslations(requestDto.getDictionaryId(),
+                        requestDto.getPartsOfSpeech(),
+                        requestDto.getPhraseTypes().stream().map(PhraseType::name).collect(
+                                Collectors.toSet()),
+                        ZonedDateTime.of(requestDto.getStartDate().atStartOfDay().minusSeconds(1),
+                                ZoneId.systemDefault()),
+                        ZonedDateTime.of(requestDto.getEndDate().atStartOfDay().plusDays(1),
+                                ZoneId.systemDefault()))
                 .collectList();
+    }
+
+    @Override
+    @Transactional
+    public Mono<Void> delete(UUID phraseId) {
+        return phraseJpaRepository.deleteById(phraseId);
     }
 
     private PhraseEntity initPhraseEntity(Phrase phrase) {

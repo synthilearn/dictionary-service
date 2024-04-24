@@ -1,6 +1,7 @@
 package com.synthilearn.dictionaryservice.infra.persistence.jpa.entity;
 
 
+import com.synthilearn.dictionaryservice.domain.PartOfSpeech;
 import com.synthilearn.dictionaryservice.domain.PhraseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,8 @@ public class PhraseTranslateEntity implements Persistable<UUID> {
     private String translationText;
     @Column("creation_date")
     private ZonedDateTime creationDate;
+    @Column("part_of_speech")
+    private PartOfSpeech partOfSpeech;
     @Column("updated_date")
     private ZonedDateTime updatedDate;
     private PhraseStatus status;

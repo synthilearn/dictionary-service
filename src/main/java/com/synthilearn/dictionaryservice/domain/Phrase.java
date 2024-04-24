@@ -18,7 +18,6 @@ public class Phrase implements Comparable<Phrase> {
     private UUID dictionaryId;
     private String text;
     private PhraseType type;
-    private PartOfSpeech partOfSpeech;
     private PhraseStatus status;
     private List<PhraseTranslate> phraseTranslates;
 
