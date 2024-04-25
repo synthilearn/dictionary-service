@@ -27,8 +27,8 @@ public class GroupPaginatorService {
         }
         TreeMap<String, TreeMap<String, TreeSet<Phrase>>> stringTreeMapTreeMap =
                 switch (requestDto.getGroups().getFirst()) {
-                    case LETTER -> groupPhrasesByFirstLetter(phrases);
-                    case PART_OF_SPEECH -> groupPhrasesByPartOfSpeech(phrases);
+                    case PART_OF_SPEECH -> groupPhrasesByFirstLetter(phrases);
+                    case LETTER -> groupPhrasesByPartOfSpeech(phrases);
                 };
         if (Boolean.FALSE.equals(requestDto.getShowTranslation())) {
             stringTreeMapTreeMap.values().stream()
