@@ -17,6 +17,9 @@ public interface DictionaryParametersMapper {
     DictionaryParameters map(DictionaryParametersEntity entity);
 
     default List<Groups> mapStringToGroupsList(String string) {
+        if (string == null) {
+            return new ArrayList<>();
+        }
         String[] groupNames = string.substring(1, string.length() - 1).split(", ");
         List<Groups> groupsList = new ArrayList<>();
         for (String groupName : groupNames) {
@@ -26,6 +29,9 @@ public interface DictionaryParametersMapper {
     }
 
     default List<PhraseType> mapStringToTypeList(String string) {
+        if (string == null) {
+            return new ArrayList<>();
+        }
         String[] groupNames = string.substring(1, string.length() - 1).split(", ");
         List<PhraseType> groupsList = new ArrayList<>();
         for (String groupName : groupNames) {
@@ -35,6 +41,9 @@ public interface DictionaryParametersMapper {
     }
 
     default List<PartOfSpeech> mapStringToPartsOfSpeechList(String string) {
+        if (string == null) {
+            return new ArrayList<>();
+        }
         String[] groupNames = string.substring(1, string.length() - 1).split(", ");
         List<PartOfSpeech> groupsList = new ArrayList<>();
         for (String groupName : groupNames) {
