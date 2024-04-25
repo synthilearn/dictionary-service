@@ -2,6 +2,7 @@ package com.synthilearn.dictionaryservice.app.services.util;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -56,7 +57,7 @@ public class GroupPaginatorService {
         TreeMap<String, TreeMap<String, TreeSet<Phrase>>> groupedPhrases = new TreeMap<>();
 
         Map<String, List<Phrase>> phrasesByFirstLetter = phrases.stream()
-                .collect(Collectors.groupingBy(phrase -> phrase.getText().substring(0, 1)));
+                .collect(Collectors.groupingBy(phrase -> phrase.getText().substring(0, 1).toUpperCase()));
 
         phrasesByFirstLetter.forEach((firstLetter, phrasesList) -> {
             TreeMap<String, TreeSet<Phrase>> innerMap = new TreeMap<>();
@@ -93,7 +94,7 @@ public class GroupPaginatorService {
             TreeMap<String, TreeSet<Phrase>> innerMap = new TreeMap<>();
 
             phrasesList.forEach(phrase -> {
-                innerMap.computeIfAbsent(phrase.getText().substring(0, 1), k -> new TreeSet<>())
+                innerMap.computeIfAbsent(phrase.getText().substring(0, 1).toUpperCase(), k -> new TreeSet<>())
                         .add(phrase);
             });
 
