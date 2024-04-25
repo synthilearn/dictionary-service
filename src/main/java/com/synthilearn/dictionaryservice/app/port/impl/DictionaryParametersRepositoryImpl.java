@@ -1,6 +1,7 @@
 package com.synthilearn.dictionaryservice.app.port.impl;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,9 @@ public class DictionaryParametersRepositoryImpl implements DictionaryParametersR
         return dictionaryParametersJpaRepository.save(DictionaryParametersEntity.builder()
                 .id(workareaId)
                 .showTranslation(true)
+                .phraseTypes(Arrays.stream(PhraseType.values()).toList().toString())
+                .groups(Arrays.stream(Groups.values()).toList().toString())
+                .partsOfSpeech(Arrays.stream(PartOfSpeech.values()).toList().toString())
                 .newRecord(true)
                 .build()
         ).map(dictionaryParametersMapper::map);
