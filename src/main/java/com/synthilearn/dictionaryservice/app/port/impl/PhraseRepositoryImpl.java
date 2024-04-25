@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.synthilearn.dictionaryservice.app.port.PhraseRepository;
-import com.synthilearn.dictionaryservice.domain.PartOfSpeech;
 import com.synthilearn.dictionaryservice.domain.Phrase;
 import com.synthilearn.dictionaryservice.domain.PhraseStatus;
 import com.synthilearn.dictionaryservice.domain.PhraseType;
@@ -69,6 +68,12 @@ public class PhraseRepositoryImpl implements PhraseRepository {
     @Transactional
     public Mono<Void> delete(UUID phraseId) {
         return phraseJpaRepository.deleteById(phraseId);
+    }
+
+    @Override
+    public Mono<List<Phrase>> findByTextPart(UUID dictionaryId, String textPart) {
+        return phraseJpaRepository.findByTextPart(dictionaryId, textPart)
+                .collectList();
     }
 
     private PhraseEntity initPhraseEntity(Phrase phrase) {

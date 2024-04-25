@@ -19,4 +19,6 @@ public interface PhraseRepository {
     Mono<List<Phrase>> findAll(GetAllPhraseRequestDto requestDto);
 
     Mono<Void> delete(UUID phraseId);
+
+    Mono<List<Phrase>> findByTextPart(UUID dictionaryId, String textPart);
 }

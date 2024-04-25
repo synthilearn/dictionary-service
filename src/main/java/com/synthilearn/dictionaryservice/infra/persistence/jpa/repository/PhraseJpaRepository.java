@@ -32,4 +32,13 @@ public interface PhraseJpaRepository extends ReactiveCrudRepository<PhraseEntity
     Flux<Phrase> findAllPhrasesWithTranslations(UUID dictionaryId, Set<PartOfSpeech> partsOfSpeech,
                                                 Set<String> types, ZonedDateTime startDate,
                                                 ZonedDateTime endDate);
+
+    @Query("SELECT DISTINCT p.* FROM phrase p " +
+            "INNER JOIN phrase_translate pt on p.id = pt.phrase_id " +
+            "WHERE p.dictionary_id = :dictionaryId " +
+            "AND (p.text ilike concat('%', :textPart, '%') " +
+            "OR pt.translation_text ilike concat('%', :textPart, '%')) " +
+            "ORDER BY p.creation_date DESC")
+    Flux<Phrase> findByTextPart(UUID dictionaryId, String textPart);
+
 }

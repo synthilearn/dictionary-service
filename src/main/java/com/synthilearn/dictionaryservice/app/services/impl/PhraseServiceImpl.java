@@ -93,6 +93,24 @@ public class PhraseServiceImpl implements PhraseService {
     }
 
     @Override
+    public Mono<List<Phrase>> findByPart(String textPart, UUID dictionaryId) {
+        return phraseRepository.findByTextPart(dictionaryId, textPart)
+                .flatMap(phrases -> {
+                    List<Mono<Phrase>> monoList = new ArrayList<>();
+                    for (Phrase phrase : phrases) {
+                        Mono<Phrase> phraseWithTranslates = phraseTranslateRepository
+                                .findByPhraseId(phrase.getId())
+                                .map(phraseTranslates -> {
+                                    phrase.setPhraseTranslates(phraseTranslates);
+                                    return phrase;
+                                });
+                        monoList.add(phraseWithTranslates);
+                    }
+                    return Mono.zip(monoList, objects -> phrases);
+                });
+    }
+
+    @Override
     @Transactional
     public Mono<Object> findAll(GetAllPhraseRequestDto requestDto) {
         return phraseRepository.findAll(requestDto)
