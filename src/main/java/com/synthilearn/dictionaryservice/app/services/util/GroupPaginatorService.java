@@ -1,74 +1,105 @@
 package com.synthilearn.dictionaryservice.app.services.util;
 
-import java.util.Comparator;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.springframework.util.CollectionUtils;
-
-import com.synthilearn.dictionaryservice.domain.Groups;
 import com.synthilearn.dictionaryservice.domain.Phrase;
+import com.synthilearn.dictionaryservice.domain.PhraseTranslate;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.GetAllPhraseRequestDto;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.NONE)
 public class GroupPaginatorService {
 
-    public static Object group(GetAllPhraseRequestDto requestDto, List<Phrase> phrases) {
-        if (CollectionUtils.isEmpty(requestDto.getGroups())) {
-            return phrases;
+    public static TreeMap<String, ?> groupPhrases(
+            List<Phrase> phrases, GetAllPhraseRequestDto requestDto) {
+        TreeMap<String, TreeMap<String, TreeSet<Phrase>>> stringTreeMapTreeMap =
+                switch (requestDto.getGroups().getFirst()) {
+                    case LETTER -> groupPhrasesByPartOfSpeech(phrases);
+                    case PART_OF_SPEECH -> groupPhrasesByFirstLetter(phrases);
+                };
+        if (Boolean.FALSE.equals(requestDto.getShowTranslation())) {
+            stringTreeMapTreeMap.values().stream()
+                    .flatMap(x -> Stream.of(x.values()))
+                    .flatMap(Collection::stream)
+                    .flatMap(Collection::stream)
+                    .forEach(phrase -> phrase.setPhraseTranslates(null));
         }
-
-        TreeMap<String, TreeMap<String, TreeSet<Phrase>>> externalMap =
-                new TreeMap<>(Comparator.naturalOrder());
-
-        for (Phrase phrase : phrases) {
-//            MapKeys keys = getKeys(phrase, groups);
-            MapKeys keys = null;
-
-            TreeMap<String, TreeSet<Phrase>> internalMap = new TreeMap<>(Comparator.naturalOrder());
-            internalMap.put(keys.getInternalKey(), new TreeSet<>() {{
-                add(phrase);
-            }});
-
-            externalMap.merge(keys.getExternalKey(),
-                    internalMap,
-                    (oldValue, newValue) -> {
-                        oldValue.merge(keys.getInternalKey(),
-                                new TreeSet<>(Comparator.comparing(Phrase::getText)) {{
-                                    add(phrase);
-                                }}, (oldValueSet, newValueSet) -> {
-                                    oldValueSet.addAll(newValueSet);
-                                    return oldValueSet;
-                                });
-                        return oldValue;
-                    });
+        if (requestDto.getGroups().size() == 1) {
+            return collapseToSingleMap(stringTreeMapTreeMap);
         }
+        return stringTreeMapTreeMap;
+    }
 
-        return null;
+    private static TreeMap<String, TreeSet<Phrase>> collapseToSingleMap(
+            TreeMap<String, TreeMap<String, TreeSet<Phrase>>> groupedPhrases) {
+        TreeMap<String, TreeSet<Phrase>> collapsedMap = new TreeMap<>();
+
+        groupedPhrases.forEach((key, innerMap) ->
+                innerMap.forEach((innerKey, phrasesSet) ->
+                        collapsedMap.computeIfAbsent(innerKey, k -> new TreeSet<>())
+                                .addAll(phrasesSet)));
+
+        return collapsedMap;
     }
 
 
-    private static MapKeys getKeys(Phrase phrase, List<Groups> groups) {
-//        if (groups.getFirst().equals(Groups.LETTER)) {
-//            return new MapKeys(phrase.getText().substring(0, 1).toUpperCase(),
-//                    phrase.getPartOfSpeech().toString());
-//        }
-//        return new MapKeys(phrase.getPartOfSpeech().toString(),
-//                phrase.getText().substring(0, 1).toUpperCase());
-        return null;
+    private static TreeMap<String, TreeMap<String, TreeSet<Phrase>>> groupPhrasesByFirstLetter(
+            List<Phrase> phrases) {
+        TreeMap<String, TreeMap<String, TreeSet<Phrase>>> groupedPhrases = new TreeMap<>();
+
+        Map<String, List<Phrase>> phrasesByFirstLetter = phrases.stream()
+                .collect(Collectors.groupingBy(phrase -> phrase.getText().substring(0, 1)));
+
+        phrasesByFirstLetter.forEach((firstLetter, phrasesList) -> {
+            TreeMap<String, TreeSet<Phrase>> innerMap = new TreeMap<>();
+
+            phrasesList.forEach(phrase -> {
+                phrase.getPhraseTranslates().forEach(translate -> {
+                    innerMap.computeIfAbsent(translate.getPartOfSpeech().toString(),
+                                    k -> new TreeSet<>())
+                            .add(phrase);
+                });
+            });
+
+            groupedPhrases.put(firstLetter, innerMap);
+        });
+
+        return groupedPhrases;
     }
 
-    @Getter
-    @AllArgsConstructor
-    static class MapKeys {
-        private String externalKey;
-        private String internalKey;
-    }
+    private static TreeMap<String, TreeMap<String, TreeSet<Phrase>>> groupPhrasesByPartOfSpeech(
+            List<Phrase> phrases) {
+        TreeMap<String, TreeMap<String, TreeSet<Phrase>>> groupedPhrases = new TreeMap<>();
 
+        Map<String, List<Phrase>> phrasesByPartOfSpeech = phrases.stream()
+                .flatMap(phrase -> phrase.getPhraseTranslates().stream())
+                .collect(Collectors.groupingBy(translate -> translate.getPartOfSpeech().toString(),
+                        Collectors.mapping(PhraseTranslate::getPhraseId,
+                                Collectors.collectingAndThen(Collectors.toList(), phraseIds ->
+                                        phrases.stream().filter(phrase ->
+                                                        phraseIds.contains(phrase.getId()))
+                                                .collect(Collectors.toList())
+                                ))));
+
+        phrasesByPartOfSpeech.forEach((partOfSpeech, phrasesList) -> {
+            TreeMap<String, TreeSet<Phrase>> innerMap = new TreeMap<>();
+
+            phrasesList.forEach(phrase -> {
+                innerMap.computeIfAbsent(phrase.getText().substring(0, 1), k -> new TreeSet<>())
+                        .add(phrase);
+            });
+
+            groupedPhrases.put(partOfSpeech, innerMap);
+        });
+
+        return groupedPhrases;
+    }
 }
