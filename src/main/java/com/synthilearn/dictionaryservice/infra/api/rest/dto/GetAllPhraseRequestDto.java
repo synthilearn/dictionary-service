@@ -25,7 +25,6 @@ public class GetAllPhraseRequestDto {
     private Integer page;
     private Integer size;
     @NotNull
-    @Size(min = 1)
     private List<Groups> groups;
     @NotNull
     private Boolean showTranslates;
