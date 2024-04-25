@@ -8,6 +8,8 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.util.CollectionUtils;
+
 import com.synthilearn.dictionaryservice.domain.Phrase;
 import com.synthilearn.dictionaryservice.domain.PhraseTranslate;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.GetAllPhraseRequestDto;
@@ -18,8 +20,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.NONE)
 public class GroupPaginatorService {
 
-    public static TreeMap<String, ?> groupPhrases(
+    public static Object groupPhrases(
             List<Phrase> phrases, GetAllPhraseRequestDto requestDto) {
+        if (CollectionUtils.isEmpty(requestDto.getGroups())) {
+            return phrases;
+        }
         TreeMap<String, TreeMap<String, TreeSet<Phrase>>> stringTreeMapTreeMap =
                 switch (requestDto.getGroups().getFirst()) {
                     case LETTER -> groupPhrasesByFirstLetter(phrases);
@@ -67,13 +72,14 @@ public class GroupPaginatorService {
                                     k -> new TreeSet<>())
                             .add(phrase.toBuilder().build())));
 
-            innerMap.forEach((partOfSpeech, phrasesSet) -> phrases.forEach(
-                    phrase -> phrase.setPhraseTranslates(phrase.getPhraseTranslates().stream()
-                            .filter(phraseTranslate -> phraseTranslate.getPartOfSpeech().name()
-                                    .equals(partOfSpeech)).collect(Collectors.toList()))));
-
             groupedPhrases.put(firstLetter, innerMap);
         });
+
+        groupedPhrases.forEach((firstLetter, map) -> map.forEach((partOfSpeech, phrasesSet) ->
+                phrasesSet.forEach(
+                        phrase -> phrase.setPhraseTranslates(phrase.getPhraseTranslates().stream()
+                                .filter(translate -> partOfSpeech.equals(
+                                        translate.getPartOfSpeech().name())).toList()))));
 
         return groupedPhrases;
     }
