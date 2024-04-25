@@ -50,11 +50,11 @@ public class DictionaryParametersRepositoryImpl implements DictionaryParametersR
         LocalDate endDate = LocalDate.ofYearDay(2100, 1);
         return dictionaryParametersJpaRepository.findById(requestDto.getDictionaryId())
                 .map(dictionaryParametersEntity -> dictionaryParametersEntity.toBuilder()
-                        .showTranslation(requestDto.getShowTranslates())
-                        .dateFrom(requestDto.getStartDate().isEqual(startDate) ? startDate :
-                                requestDto.getStartDate())
-                        .dateTo(requestDto.getEndDate().isEqual(endDate) ? endDate :
-                                requestDto.getEndDate())
+                        .showTranslation(requestDto.getShowTranslation())
+                        .dateFrom(requestDto.getDateFrom().isEqual(startDate) ? startDate :
+                                requestDto.getDateFrom())
+                        .dateTo(requestDto.getDateTo().isEqual(endDate) ? endDate :
+                                requestDto.getDateTo())
                         .partsOfSpeech(
                                 requestDto.getPartsOfSpeech().stream().map(PartOfSpeech::name)
                                         .collect(Collectors.toSet()).toString())

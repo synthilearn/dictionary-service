@@ -27,12 +27,12 @@ public class GetAllPhraseRequestDto {
     @NotNull
     private List<Groups> groups;
     @NotNull
-    private Boolean showTranslates;
+    private Boolean showTranslation;
     @NotNull
     @Size(min = 1)
     private Set<PartOfSpeech> partsOfSpeech;
-    private LocalDate startDate = LocalDate.ofYearDay(1900, 1);
-    private LocalDate endDate = LocalDate.ofYearDay(2100, 1);
+    private LocalDate dateFrom = LocalDate.ofYearDay(1900, 1);
+    private LocalDate dateTo = LocalDate.ofYearDay(2100, 1);
     @NotNull
     @Size(min = 1)
     private List<PhraseType> phraseTypes;

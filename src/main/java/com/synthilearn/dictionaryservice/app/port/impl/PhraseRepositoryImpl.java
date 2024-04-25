@@ -57,9 +57,9 @@ public class PhraseRepositoryImpl implements PhraseRepository {
                         requestDto.getPartsOfSpeech(),
                         requestDto.getPhraseTypes().stream().map(PhraseType::name).collect(
                                 Collectors.toSet()),
-                        ZonedDateTime.of(requestDto.getStartDate().atStartOfDay().minusSeconds(1),
+                        ZonedDateTime.of(requestDto.getDateFrom().atStartOfDay().minusSeconds(1),
                                 ZoneId.systemDefault()),
-                        ZonedDateTime.of(requestDto.getEndDate().atStartOfDay().plusDays(1),
+                        ZonedDateTime.of(requestDto.getDateTo().atStartOfDay().plusDays(1),
                                 ZoneId.systemDefault()))
                 .collectList();
     }
