@@ -51,7 +51,7 @@ public class PhraseTranslateRepositoryImpl implements PhraseTranslateRepository 
                                 List<PhraseTranslateEntity> translationsToRemove =
                                         oldTranslates.stream()
                                                 .filter(translate -> translations.stream()
-                                                        .noneMatch(x -> x.getText()
+                                                        .noneMatch(x -> x.getTranslationText()
                                                                 .equals(translate.getTranslationText())
                                                                 && x.getPartOfSpeech()
                                                                 .equals(translate.getPartOfSpeech())))
@@ -61,7 +61,7 @@ public class PhraseTranslateRepositoryImpl implements PhraseTranslateRepository 
                                         newPhraseTranslateEntities.stream()
                                                 .filter(translate -> existingTranslations.stream()
                                                         .noneMatch(existingTranslation ->
-                                                                existingTranslation.getText()
+                                                                existingTranslation.getTranslationText()
                                                                         .equals(translate.getTranslationText()) &&
                                                                         existingTranslation.getPartOfSpeech()
                                                                                 .equals(translate.getPartOfSpeech())))
@@ -105,7 +105,7 @@ public class PhraseTranslateRepositoryImpl implements PhraseTranslateRepository 
         return translations.stream().map(translate -> PhraseTranslateEntity.builder()
                 .id(UUID.randomUUID())
                 .phraseId(phraseId)
-                .translationText(translate.getText())
+                .translationText(translate.getTranslationText())
                 .partOfSpeech(translate.getPartOfSpeech())
                 .creationDate(ZonedDateTime.now())
                 .updatedDate(ZonedDateTime.now())

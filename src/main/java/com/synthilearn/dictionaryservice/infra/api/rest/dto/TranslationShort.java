@@ -16,5 +16,5 @@ public class TranslationShort {
     @NotNull
     private PartOfSpeech partOfSpeech;
     @NotBlank
-    private String text;
+    private String translationText;
 }
