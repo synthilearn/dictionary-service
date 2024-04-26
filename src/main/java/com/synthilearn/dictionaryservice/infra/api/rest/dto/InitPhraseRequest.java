@@ -30,5 +30,5 @@ public class InitPhraseRequest {
     @NotNull
     @Valid
     @Size(min = 1)
-    private List<TranslationShort> translations;
+    private List<TranslationShort> phraseTranslates;
 }

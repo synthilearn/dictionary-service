@@ -41,7 +41,7 @@ public class PhraseServiceImpl implements PhraseService {
                 .flatMap(phraseOpt -> phraseOpt.<Mono<? extends Phrase>>map(Mono::just)
                         .orElse(phraseRepository.initPhrase(initPhraseDomain(request))))
                 .flatMap(phrase -> phraseTranslateRepository
-                        .updatePhraseTranslations(phrase.getId(), request.getTranslations())
+                        .updatePhraseTranslations(phrase.getId(), request.getPhraseTranslates())
                         .map(phraseTranslates -> {
                             phrase.setPhraseTranslates(phraseTranslates);
                             return phraseTranslates;
