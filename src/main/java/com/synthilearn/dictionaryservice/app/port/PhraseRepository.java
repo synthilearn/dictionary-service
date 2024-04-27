@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 public interface PhraseRepository {
 
     Mono<Phrase> initPhrase(Phrase phrase);
+    Mono<Phrase> save(Phrase phrase);
 
     Mono<Phrase> findById(UUID phraseId);
 

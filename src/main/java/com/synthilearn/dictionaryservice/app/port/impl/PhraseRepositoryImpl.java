@@ -37,6 +37,17 @@ public class PhraseRepositoryImpl implements PhraseRepository {
     }
 
     @Override
+    @Transactional
+    public Mono<Phrase> save(Phrase phrase) {
+        return phraseJpaRepository.findById(phrase.getId())
+                .flatMap(entity -> {
+                    entity.setText(phrase.getText());
+                    return phraseJpaRepository.save(entity)
+                            .map(phraseEntityMapper::map);
+                });
+    }
+
+    @Override
     public Mono<Phrase> findById(UUID phraseId) {
         if (phraseId == null) {
             return Mono.empty();

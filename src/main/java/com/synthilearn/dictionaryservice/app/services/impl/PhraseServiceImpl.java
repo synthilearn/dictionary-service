@@ -38,7 +38,10 @@ public class PhraseServiceImpl implements PhraseService {
     public Mono<Phrase> initPhrase(InitPhraseRequest request) {
         return phraseRepository.findById(request.getId())
                 .singleOptional()
-                .flatMap(phraseOpt -> phraseOpt.<Mono<? extends Phrase>>map(Mono::just)
+                .flatMap(phraseOpt -> phraseOpt.<Mono<? extends Phrase>>map(phrase -> {
+                            phrase.setText(request.getText());
+                            return phraseRepository.save(phrase);
+                        })
                         .orElse(phraseRepository.initPhrase(initPhraseDomain(request))))
                 .flatMap(phrase -> phraseTranslateRepository
                         .updatePhraseTranslations(phrase.getId(), request.getPhraseTranslates())
