@@ -38,6 +38,9 @@ public class PhraseRepositoryImpl implements PhraseRepository {
 
     @Override
     public Mono<Phrase> findById(UUID phraseId) {
+        if (phraseId == null) {
+            return Mono.empty();
+        }
         return phraseJpaRepository.findById(phraseId)
                 .map(phraseEntityMapper::map);
     }
