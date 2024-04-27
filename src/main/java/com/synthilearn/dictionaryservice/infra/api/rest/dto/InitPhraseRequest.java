@@ -23,6 +23,7 @@ public class InitPhraseRequest {
 
     @NotNull
     private UUID dictionaryId;
+    private UUID id;
     @NotBlank
     private String text;
     @NotNull

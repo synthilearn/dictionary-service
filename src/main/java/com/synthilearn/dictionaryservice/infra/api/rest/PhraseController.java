@@ -46,15 +46,13 @@ public class PhraseController {
     }
 
     @GetMapping("/{phraseId}")
-    public Mono<GenericResponse<Phrase>> findById(
-            @PathVariable UUID phraseId) {
+    public Mono<GenericResponse<Phrase>> findById(@PathVariable UUID phraseId) {
         return phraseService.findById(phraseId)
                 .map(GenericResponse::ok);
     }
 
     @DeleteMapping("/{phraseId}")
-    public Mono<GenericResponse<Void>> deletePhrase(
-            @PathVariable UUID phraseId) {
+    public Mono<GenericResponse<Void>> deletePhrase(@PathVariable UUID phraseId) {
         return phraseService.delete(phraseId)
                 .map(GenericResponse::ok);
     }

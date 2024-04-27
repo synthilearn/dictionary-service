@@ -36,7 +36,7 @@ public class PhraseServiceImpl implements PhraseService {
 
     @Override
     public Mono<Phrase> initPhrase(InitPhraseRequest request) {
-        return phraseRepository.findByText(request.getText(), request.getDictionaryId())
+        return phraseRepository.findById(request.getId())
                 .singleOptional()
                 .flatMap(phraseOpt -> phraseOpt.<Mono<? extends Phrase>>map(Mono::just)
                         .orElse(phraseRepository.initPhrase(initPhraseDomain(request))))
