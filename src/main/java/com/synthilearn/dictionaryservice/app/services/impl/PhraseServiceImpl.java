@@ -1,6 +1,7 @@
 package com.synthilearn.dictionaryservice.app.services.impl;
 
-import static com.synthilearn.dictionaryservice.app.services.util.GroupPaginatorService.groupPhrases;
+import static com.synthilearn.dictionaryservice.app.services.util.GroupServiceUtil.groupPhrases;
+import static com.synthilearn.dictionaryservice.app.services.util.PaginatorServiceUtil.paginate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,7 +133,8 @@ public class PhraseServiceImpl implements PhraseService {
                     }
                     return Mono.zip(monoList, objects -> phrases);
                 })
-                .flatMap(phrases -> Mono.just(groupPhrases(phrases, requestDto)));
+                .flatMap(phrases -> Mono.just(groupPhrases(phrases, requestDto)))
+                .flatMap(phrases -> Mono.just(paginate(phrases, requestDto)));
     }
 
     private Phrase initPhraseDomain(InitPhraseRequest request) {

@@ -1,6 +1,7 @@
 package com.synthilearn.dictionaryservice.app.services.util;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,11 +19,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.NONE)
-public class GroupPaginatorService {
+public class GroupServiceUtil {
 
     public static Object groupPhrases(
             List<Phrase> phrases, GetAllPhraseRequestDto requestDto) {
         if (CollectionUtils.isEmpty(requestDto.getGroups())) {
+            Collections.sort(phrases);
             return phrases;
         }
         TreeMap<String, TreeMap<String, TreeSet<Phrase>>> stringTreeMapTreeMap =
