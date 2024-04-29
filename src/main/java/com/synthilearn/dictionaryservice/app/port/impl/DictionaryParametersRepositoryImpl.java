@@ -51,9 +51,9 @@ public class DictionaryParametersRepositoryImpl implements DictionaryParametersR
         return dictionaryParametersJpaRepository.findById(requestDto.getDictionaryId())
                 .map(dictionaryParametersEntity -> dictionaryParametersEntity.toBuilder()
                         .showTranslation(requestDto.getShowTranslation())
-                        .dateFrom(requestDto.getDateFrom().isEqual(startDate) ? startDate :
+                        .dateFrom(startDate.isEqual(requestDto.getDateFrom()) ? null :
                                 requestDto.getDateFrom())
-                        .dateTo(requestDto.getDateTo().isEqual(endDate) ? endDate :
+                        .dateTo(endDate.isEqual(requestDto.getDateTo()) ? null :
                                 requestDto.getDateTo())
                         .partsOfSpeech(
                                 requestDto.getPartsOfSpeech().stream().map(PartOfSpeech::name)
