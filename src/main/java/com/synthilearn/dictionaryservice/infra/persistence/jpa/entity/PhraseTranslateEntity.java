@@ -36,6 +36,8 @@ public class PhraseTranslateEntity implements Persistable<UUID> {
     @Column("updated_date")
     private ZonedDateTime updatedDate;
     private PhraseStatus status;
+    @Column("learn_level")
+    private Integer learnLevel;
 
     @Transient
     private boolean newRecord;

@@ -104,6 +104,7 @@ public class PhraseTranslateRepositoryImpl implements PhraseTranslateRepository 
             UUID phraseId) {
         return translations.stream().map(translate -> PhraseTranslateEntity.builder()
                 .id(UUID.randomUUID())
+                .learnLevel(30)
                 .phraseId(phraseId)
                 .translationText(translate.getTranslationText())
                 .partOfSpeech(translate.getPartOfSpeech())

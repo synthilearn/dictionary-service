@@ -28,6 +28,9 @@
             <column name="status" type="VARCHAR(32)">
                 <constraints nullable="false"/>
             </column>
+            <column name="learn_level" type="int" defaultValue="30">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 
