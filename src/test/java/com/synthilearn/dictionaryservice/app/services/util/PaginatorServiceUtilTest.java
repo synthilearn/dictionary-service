@@ -60,7 +60,7 @@ class PaginatorServiceUtilTest {
 
         List<Phrase> phrasesResult = (List<Phrase>) result.getPhrases();
         assertEquals(phrasesResult.size(), phrasesList.size());
-        assertEquals(result.getTotalPage(), 1);
+        assertEquals(result.getTotalPages(), 1);
     }
 
     @Test
@@ -74,7 +74,7 @@ class PaginatorServiceUtilTest {
 
         List<Phrase> phrasesResult = (List<Phrase>) result.getPhrases();
         assertEquals(2, phrasesResult.size());
-        assertEquals(3, result.getTotalPage());
+        assertEquals(3, result.getTotalPages());
         assertTrue(phrasesResult.stream()
                 .allMatch(el -> el.getText().equals("bas") || el.getText().equals("await")));
     }
@@ -90,7 +90,7 @@ class PaginatorServiceUtilTest {
 
         List<Phrase> phrasesResult = (List<Phrase>) result.getPhrases();
         assertEquals(2, phrasesResult.size());
-        assertEquals(3, result.getTotalPage());
+        assertEquals(3, result.getTotalPages());
         assertTrue(phrasesResult.stream()
                 .allMatch(el -> el.getText().equals("beast") || el.getText().equals("beer")));
     }
@@ -200,7 +200,7 @@ class PaginatorServiceUtilTest {
 
             assertTrue(sizes[i] >=
                     phrasesResult.values().stream().mapToInt(phrases -> phrases.size() + 1).sum(), "Ошибка на итерации: " + i);
-            assertEquals((int) result.getTotalPage(), totalPages[i]);
+            assertEquals((int) result.getTotalPages(), totalPages[i]);
             assertTrue(phrasesResults.get(i).test(phrasesResult));
         }
 

@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaginateInfo {
-    private Integer totalPage;
+    private Integer totalPages;
     private Object phrases;
 }
