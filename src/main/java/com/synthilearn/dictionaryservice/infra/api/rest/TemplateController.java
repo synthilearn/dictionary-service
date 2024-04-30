@@ -2,6 +2,7 @@ package com.synthilearn.dictionaryservice.infra.api.rest;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,7 @@ import com.synthilearn.dictionaryservice.app.services.TemplateService;
 import com.synthilearn.dictionaryservice.domain.Template;
 import com.synthilearn.dictionaryservice.domain.mapper.TemplateDtoMapper;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.CreateTemplateRequest;
+import com.synthilearn.dictionaryservice.infra.api.rest.dto.PhraseShort;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -41,6 +43,13 @@ public class TemplateController {
     @GetMapping("/all")
     public Mono<GenericResponse<List<Template>>> getAll() {
         return templateService.getAll()
+                .map(GenericResponse::ok);
+    }
+
+    @GetMapping("/{id}")
+    public Mono<GenericResponse<List<PhraseShort>>> getTemplatePreview(@PathVariable UUID id) {
+        return templateService.getPreview(id)
+                .map(el -> el.stream().map(mapper::map).toList())
                 .map(GenericResponse::ok);
     }
 

@@ -1,6 +1,5 @@
 package com.synthilearn.dictionaryservice.domain;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 

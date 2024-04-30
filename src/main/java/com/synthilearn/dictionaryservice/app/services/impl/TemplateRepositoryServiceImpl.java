@@ -102,6 +102,20 @@ public class TemplateRepositoryServiceImpl implements TemplateService {
                 });
     }
 
+    @Override
+    public Mono<List<Phrase>> getPreview(UUID templateId) {
+        return templateRepository.findTemplateById(templateId)
+                .map(template -> {
+                    Map<Phrase, Set<PhraseTranslate>> phraseSetMap =
+                            parsePhrases(template.getFile());
+                    return phraseSetMap.entrySet().stream().map(entry -> {
+                        Phrase phrase = entry.getKey();
+                        phrase.setPhraseTranslates(entry.getValue().stream().toList());
+                        return phrase;
+                    }).toList();
+                });
+    }
+
     private PhraseTranslate initTranslate(PhraseTranslate phraseTranslate, UUID phraseId) {
         return phraseTranslate.toBuilder()
                 .learnLevel(30)

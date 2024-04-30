@@ -3,11 +3,13 @@ package com.synthilearn.dictionaryservice.app.port.impl;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.synthilearn.dictionaryservice.app.port.TemplateRepository;
 import com.synthilearn.dictionaryservice.domain.Template;
+import com.synthilearn.dictionaryservice.infra.api.rest.exception.parent.GenericException;
 import com.synthilearn.dictionaryservice.infra.persistence.jpa.mapper.TemplateMapper;
 import com.synthilearn.dictionaryservice.infra.persistence.jpa.repository.TemplateJpaRepository;
 
@@ -37,6 +39,7 @@ public class TemplateRepositoryImpl implements TemplateRepository {
     public Mono<Template> findTemplateById(UUID templateId) {
         return repository.findById(templateId)
                 .map(templateMapper::map)
-                .switchIfEmpty(Mono.error(new RuntimeException("Шаблон не найден")));
+                .switchIfEmpty(Mono.error(
+                        new GenericException("Шаблон не найден", HttpStatus.NOT_FOUND, 1000)));
     }
 }
