@@ -94,11 +94,13 @@ public class PaginatorServiceUtil {
             }
 
             if (++sizeCounter <= requestDto.getSize()) {
-                newPhrasesTree.put(entry.getKey(), new TreeSet<>(entry.getValue().stream()
+                TreeSet<Phrase> value = new TreeSet<>(entry.getValue().stream()
                         .skip(Math.max(0, offset - offsetCounter))
                         .limit(requestDto.getSize() - sizeCounter)
-                        .collect(Collectors.toSet())));
-                sizeCounter += phrasesSize;
+                        .collect(Collectors.toSet()));
+                offsetCounter += offset;
+                newPhrasesTree.put(entry.getKey(), value);
+                sizeCounter += value.size();
                 continue;
             }
             break;
