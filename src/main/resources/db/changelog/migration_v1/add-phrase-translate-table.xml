@@ -13,9 +13,7 @@
             <column name="phrase_id" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="part_of_speech" type="VARCHAR(1024)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="part_of_speech" type="VARCHAR(1024)"/>
             <column name="translation_text" type="VARCHAR(1024)">
                 <constraints nullable="false"/>
             </column>

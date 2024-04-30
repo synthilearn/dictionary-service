@@ -59,10 +59,7 @@ public class PhraseRepositoryImpl implements PhraseRepository {
     @Override
     public Mono<Phrase> findByText(String text, UUID dictionaryId) {
         return phraseJpaRepository.findFirstByTextAndDictionaryId(text, dictionaryId)
-                .map(x -> {
-                    System.out.println(x);
-                    return phraseEntityMapper.map(x);
-                });
+                .map(phraseEntityMapper::map);
     }
 
     @Override

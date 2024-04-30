@@ -16,4 +16,6 @@ public interface PhraseTranslateRepository {
     Mono<List<PhraseTranslate>> findByPhraseId(UUID phraseId);
 
     Mono<Void> deleteAll(UUID phraseId);
+
+    Mono<PhraseTranslate> addTranslate(PhraseTranslate phraseTranslate);
 }

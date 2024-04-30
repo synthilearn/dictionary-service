@@ -9,5 +9,6 @@
     <include file="add-dictionary-parameters-table.xml" relativeToChangelogFile="true"/>
     <include file="add-phrase-table.xml" relativeToChangelogFile="true"/>
     <include file="add-phrase-translate-table.xml" relativeToChangelogFile="true"/>
+    <include file="add-templates-table.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

@@ -98,6 +98,16 @@ public class PhraseTranslateRepositoryImpl implements PhraseTranslateRepository 
                 .then();
     }
 
+    @Override
+    @Transactional
+    public Mono<PhraseTranslate> addTranslate(PhraseTranslate phraseTranslate) {
+        return translateJpaRepository.save(
+                phraseTranslateEntityMapper.map(phraseTranslate).toBuilder()
+                        .newRecord(true)
+                        .build())
+                .map(phraseTranslateEntityMapper::map);
+    }
+
 
     private List<PhraseTranslateEntity> initListPhraseTranslateEntity(
             List<TranslationShort> translations,

@@ -17,7 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Table("phrase_translate")
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

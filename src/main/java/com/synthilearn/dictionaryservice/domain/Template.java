@@ -1,26 +1,23 @@
 package com.synthilearn.dictionaryservice.domain;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = {"translationText", "partOfSpeech"})
-public class PhraseTranslate {
+public class Template {
 
     private UUID id;
-    private UUID phraseId;
-    private String translationText;
-    private PhraseStatus status;
-    private PartOfSpeech partOfSpeech;
+    private String name;
+    private byte[] file;
+    private Integer amountWords;
     private ZonedDateTime creationDate;
-    private Integer learnLevel;
 }
