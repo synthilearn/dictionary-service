@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.synthilearn.commonstarter.GenericResponse;
 import com.synthilearn.dictionaryservice.app.services.PhraseService;
 import com.synthilearn.dictionaryservice.domain.Phrase;
+import com.synthilearn.dictionaryservice.infra.api.rest.dto.ChangeProgressRequest;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.GetAllPhraseRequestDto;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.InitPhraseRequest;
 
@@ -69,6 +70,13 @@ public class PhraseController {
                                                          @RequestParam("dictionaryId")
                                                          UUID dictionaryId) {
         return phraseService.findByPart(textPart, dictionaryId)
+                .map(GenericResponse::ok);
+    }
+
+    @PostMapping("/change-progress")
+    public Mono<GenericResponse<Void>> changeProgress(
+            @Valid @RequestBody ChangeProgressRequest request) {
+        return phraseService.changeProgress(request)
                 .map(GenericResponse::ok);
     }
 }

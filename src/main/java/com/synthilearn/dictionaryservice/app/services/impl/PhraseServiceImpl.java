@@ -19,12 +19,16 @@ import com.synthilearn.dictionaryservice.domain.Phrase;
 import com.synthilearn.dictionaryservice.domain.PhraseStatus;
 import com.synthilearn.dictionaryservice.domain.PhraseTranslate;
 import com.synthilearn.dictionaryservice.domain.mapper.PhraseDtoMapper;
+import com.synthilearn.dictionaryservice.infra.api.rest.dto.ChangeProgressRequest;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.GetAllPhraseRequestDto;
 import com.synthilearn.dictionaryservice.infra.api.rest.dto.InitPhraseRequest;
 import com.synthilearn.dictionaryservice.infra.api.rest.exception.PhraseException;
+import com.synthilearn.dictionaryservice.infra.persistence.jpa.repository.PhraseTranslateJpaRepository;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class PhraseServiceImpl implements PhraseService {
     private final PhraseTranslateRepository phraseTranslateRepository;
     private final DictionaryParametersRepository dictionaryParametersRepository;
     private final PhraseDtoMapper phraseDtoMapper;
+    private final PhraseTranslateJpaRepository phraseTranslateJpaRepository;
 
     @Override
     public Mono<Phrase> initPhrase(InitPhraseRequest request) {
@@ -106,6 +111,19 @@ public class PhraseServiceImpl implements PhraseService {
                     }
                     return Mono.zip(monoList, objects -> phrases);
                 });
+    }
+
+    @Override
+    @Transactional
+    public Mono<Void> changeProgress(ChangeProgressRequest request) {
+        return Flux.fromIterable(request.getProgressEntries())
+                .flatMap(translate -> phraseTranslateJpaRepository.findById(translate.getId())
+                        .flatMap(translateEntity -> {
+                            translateEntity.setLearnLevel(translate.getNewProgress());
+                            return phraseTranslateJpaRepository.save(translateEntity);
+                        })
+                        .subscribeOn(Schedulers.parallel()))
+                .then();
     }
 
     @Override
